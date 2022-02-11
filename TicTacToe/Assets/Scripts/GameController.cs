@@ -16,6 +16,7 @@ public class GameController : MonoBehaviour
     public float boardScale = 0.85f; // Percentage of Background.
     public GameObject gridLineVertPrefab;
     public GameObject gridLineHorizPrefab;
+    public GameObject gridSpacePrefab;
 
     public Text[] buttonList;
 
@@ -110,8 +111,21 @@ public class GameController : MonoBehaviour
             hLine.GetComponent<RectTransform>().anchoredPosition = pos;
         }
 
-        // Calculate the size of the grid spaces.
         // Instantiate the grid spaces.
+        // XXX - Fix control variable names.
+        // XXX - Add buttons to buttonList array.
+
+        for (int i = 0; i < r; i++)
+        {
+            for (int j = 0; j < c; j++)
+            {
+                var xPos = (initialX - spaceSize / 2) + spaceSize * i;
+                var yPos = (initialY + spaceSize / 2) - spaceSize * j;
+                var pos = new Vector3(xPos, yPos, 0);
+                var gs = Instantiate(gridSpacePrefab, grid.transform);
+                gs.GetComponent<RectTransform>().anchoredPosition = pos;
+            }
+        }
 
         // Wire up buttons (grid spaces).
         SetGameControllerReferenceOnButtons();
