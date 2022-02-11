@@ -68,16 +68,16 @@ public class GameController : MonoBehaviour
         var spaceSize = boardSize / Math.Max(r, c);
 
         // Vertical lines -- start on the left and move right.
+        var vLines = c - 1;
         float initialX;
-        if (c % 2 == 0)
+        if (vLines % 2 == 0)
         {
-            // Even number of spaces, odd number of lines.
-            var spaces = c - 2; // # of lines, not counting the middle.
-            initialX = -(spaces / 2 * spaceSize);
+            // Even number of lines, odd number of spaces.
+            initialX = -spaceSize / 2 - ((vLines / 2 - 1) * spaceSize);
         } else {
-            // Odd number of spaces, even number of lines.
-            var spaces = c - 2;
-            initialX = -(spaces / 2 * spaceSize);
+            // Odd number of lines, even number of spaces.
+            // One line is in the center.
+            initialX = -(vLines / 2 * spaceSize);
         }
         var rot = gridLineVertPrefab.transform.rotation;
         for (int i = 0; i < c - 1; i++) {
