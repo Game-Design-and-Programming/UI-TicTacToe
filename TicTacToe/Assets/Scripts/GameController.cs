@@ -9,8 +9,8 @@ using UnityEngine.UI;
 public class GameController : MonoBehaviour
 {
     // Size of the game grid.
-    public static int rows = 3;   // Rows
-    public static int columns = 3;   // Columns
+    public int rows = 3;   // Rows
+    public int columns = 3;   // Columns
     // Marks in a row to win.
     public int k = 3;
 
@@ -24,12 +24,13 @@ public class GameController : MonoBehaviour
     // Warning! If buttonTextList is declared public, it will be set(able) in the
     // Inspector -- that means that the length of the array will come from the Inspector,
     // not from here. Weird, but logical...
-    Text[] buttonTextList = new Text[rows * columns];
+    Text[] buttonTextList;
 
     private string playerSide;
 
     void Awake()
     {
+        buttonTextList = new Text[rows * columns];
         LayoutGrid();
         ResetGame();
     }
