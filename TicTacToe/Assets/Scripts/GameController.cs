@@ -84,14 +84,32 @@ public class GameController : MonoBehaviour
             var pos = new Vector3((initialX + i * spaceSize), 0, 0);
             Debug.Log("initialX = " + pos.x);
 
-            var line = Instantiate(gridLineVertPrefab, grid.transform);
-            line.GetComponent<RectTransform>().anchoredPosition = pos;
+            var vLine = Instantiate(gridLineVertPrefab, grid.transform);
+            vLine.GetComponent<RectTransform>().anchoredPosition = pos;
         }
 
-        for (int i = 0; i < r - 1; i++) {
-            Instantiate(gridLineHorizPrefab, grid.transform);
+        // Horizontal lines -- start at the top and move down.
+        var hLines = r - 1;
+        float initialY;
+        if (vLines % 2 == 0)
+        {
+            // Even number of lines, odd number of spaces.
+            initialY = spaceSize / 2 + ((hLines / 2 - 1) * spaceSize);
         }
-        
+        else
+        {
+            // Odd number of lines, even number of spaces.
+            // One line is in the center.
+            initialY = (hLines / 2 * spaceSize);
+        }
+        rot = gridLineHorizPrefab.transform.rotation; for (int i = 0; i < r - 1; i++) {
+            var pos = new Vector3(0, (initialY - i * spaceSize), 0);
+            Debug.Log("initialY = " + pos.y);
+
+            var hLine = Instantiate(gridLineHorizPrefab, grid.transform);
+            hLine.GetComponent<RectTransform>().anchoredPosition = pos;
+        }
+
         // Calculate the size of the grid spaces.
         // Instantiate the grid spaces.
 
