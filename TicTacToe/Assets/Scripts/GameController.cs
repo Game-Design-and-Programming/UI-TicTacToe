@@ -4,11 +4,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+// XXX - singleton, no? enforce that.
+
 public class GameController : MonoBehaviour
 {
     // Size of the game grid.
-    public int rows = 3;   // Rows
-    public int columns = 3;   // Columns
+    public static int rows = 3;   // Rows
+    public static int columns = 3;   // Columns
     // Marks in a row to win.
     public int k = 3;
 
@@ -19,7 +21,10 @@ public class GameController : MonoBehaviour
     public GameObject gridLineHorizPrefab;
     public GameObject gridSpacePrefab;
 
-    public Text[] buttonList;
+    // Warning! If buttonTextList is declared public, it will be set(able) in the
+    // Inspector -- that means that the length of the array will come from the Inspector,
+    // not from here. Weird, but logical...
+    Text[] buttonTextList = new Text[rows * columns];
 
     private string playerSide;
 
@@ -96,9 +101,7 @@ public class GameController : MonoBehaviour
         {
             // Even number of lines, odd number of spaces.
             initialY = spaceSize / 2 + ((hGridLines / 2 - 1) * spaceSize);
-        }
-        else
-        {
+        } else {
             // Odd number of lines, even number of spaces.
             // One line is in the center.
             initialY = (hGridLines / 2 * spaceSize);
@@ -111,7 +114,6 @@ public class GameController : MonoBehaviour
         }
 
         // Instantiate the grid spaces.
-        // XXX - Add buttons to buttonList array.
 
         for (int r = 0; r < rows; r++)
         {
@@ -123,6 +125,19 @@ public class GameController : MonoBehaviour
                 var pos = new Vector3(xPos, yPos, 0);
                 var gs = Instantiate(gridSpacePrefab, grid.transform);
                 gs.GetComponent<RectTransform>().anchoredPosition = pos;
+
+                var buttonTextIndex = r * columns + c;
+                Debug.Log("buttonTextList.Length = " + buttonTextList.Length);
+                Debug.Log("buttonTextIndex = " + buttonTextIndex);
+
+                // Get the Text component of the Text object that is a child of the
+                // GridSpace button.
+                var textGameObject = gs.transform.GetChild(0).gameObject;
+                buttonTextList[buttonTextIndex] = textGameObject.GetComponent<Text>();
+                if (buttonTextList[buttonTextIndex] == null)
+                {
+                    Debug.Log("buttonTextList[" + buttonTextIndex + "] is null");
+                }
             }
         }
 
@@ -132,9 +147,11 @@ public class GameController : MonoBehaviour
 
     void SetGameControllerReferenceOnButtons()
     {
-        for (int i = 0; i < buttonList.Length; i++)
+        for (int i = 0; i < buttonTextList.Length; i++)
         {
-            buttonList[i].GetComponentInParent<GridSpace>().SetGameControllerReference(this);
+            // Debug.Log("buttonTextList[" + i + "] = " + buttonTextList[i]);
+            // Debug.Log("GridSpace = " + buttonTextList[i].GetComponentInParent<GridSpace>());
+            buttonTextList[i].GetComponentInParent<GridSpace>().SetGameControllerReference(this);
         }
     }
 
@@ -145,42 +162,42 @@ public class GameController : MonoBehaviour
 
     public void EndTurn()
     {
-        if (buttonList[0].text == playerSide && buttonList[1].text == playerSide && buttonList[2].text == playerSide)
+        if (buttonTextList[0].text == playerSide && buttonTextList[1].text == playerSide && buttonTextList[2].text == playerSide)
         {
             GameOver();
         }
 
-        if (buttonList[3].text == playerSide && buttonList[4].text == playerSide && buttonList[5].text == playerSide)
+        if (buttonTextList[3].text == playerSide && buttonTextList[4].text == playerSide && buttonTextList[5].text == playerSide)
         {
             GameOver();
         }
 
-        if (buttonList[6].text == playerSide && buttonList[7].text == playerSide && buttonList[8].text == playerSide)
+        if (buttonTextList[6].text == playerSide && buttonTextList[7].text == playerSide && buttonTextList[8].text == playerSide)
         {
             GameOver();
         }
 
-        if (buttonList[0].text == playerSide && buttonList[3].text == playerSide && buttonList[6].text == playerSide)
+        if (buttonTextList[0].text == playerSide && buttonTextList[3].text == playerSide && buttonTextList[6].text == playerSide)
         {
             GameOver();
         }
 
-        if (buttonList[1].text == playerSide && buttonList[4].text == playerSide && buttonList[7].text == playerSide)
+        if (buttonTextList[1].text == playerSide && buttonTextList[4].text == playerSide && buttonTextList[7].text == playerSide)
         {
             GameOver();
         }
 
-        if (buttonList[2].text == playerSide && buttonList[5].text == playerSide && buttonList[8].text == playerSide)
+        if (buttonTextList[2].text == playerSide && buttonTextList[5].text == playerSide && buttonTextList[8].text == playerSide)
         {
             GameOver();
         }
 
-        if (buttonList[0].text == playerSide && buttonList[4].text == playerSide && buttonList[8].text == playerSide)
+        if (buttonTextList[0].text == playerSide && buttonTextList[4].text == playerSide && buttonTextList[8].text == playerSide)
         {
             GameOver();
         }
 
-        if (buttonList[2].text == playerSide && buttonList[4].text == playerSide && buttonList[6].text == playerSide)
+        if (buttonTextList[2].text == playerSide && buttonTextList[4].text == playerSide && buttonTextList[6].text == playerSide)
         {
             GameOver();
         }
@@ -195,9 +212,9 @@ public class GameController : MonoBehaviour
 
     void GameOver()
     {
-        for (int i = 0; i < buttonList.Length; i++)
+        for (int i = 0; i < buttonTextList.Length; i++)
         {
-            buttonList[i].GetComponentInParent<Button>().interactable = false;
+            buttonTextList[i].GetComponentInParent<Button>().interactable = false;
         }
     }
 }
