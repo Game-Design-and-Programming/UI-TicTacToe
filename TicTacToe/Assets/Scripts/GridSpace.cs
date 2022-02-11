@@ -1,18 +1,16 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class GridSpace : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    public Button button;
+    public Text buttonText;
+    public string playerSide;
 
-    // Update is called once per frame
-    void Update()
+    public void SetSpace()
     {
-        
+        buttonText.text = playerSide; button.interactable = false;
     }
 }
