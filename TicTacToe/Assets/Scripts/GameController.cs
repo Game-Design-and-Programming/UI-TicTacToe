@@ -7,13 +7,14 @@ using UnityEngine.UI;
 public class GameController : MonoBehaviour
 {
     // Size of the game grid.
-    public int m = 3;   // Rows
-    public int n = 3;   // Columns
+    public int rows = 3;   // Rows
+    public int columns = 3;   // Columns
     // Marks in a row to win.
     public int k = 3;
 
     // Layout parameters & objects
     public float boardScale = 0.85f; // Percentage of Background.
+
     public GameObject gridLineVertPrefab;
     public GameObject gridLineHorizPrefab;
     public GameObject gridSpacePrefab;
@@ -24,7 +25,7 @@ public class GameController : MonoBehaviour
 
     void Awake()
     {
-        LayoutGrid(m, n);
+        LayoutGrid();
         ResetGame();
     }
 
@@ -33,7 +34,7 @@ public class GameController : MonoBehaviour
         playerSide = "X";
     }
 
-    private void LayoutGrid(int r, int c)
+    private void LayoutGrid()
     {
         // Find the size of the display area (Background panel).
         // XXX - Assuming the board is square.
@@ -66,61 +67,59 @@ public class GameController : MonoBehaviour
         var grid = GameObject.Find("Grid");
 
         // Calculate the size of the grid spaces. They will always be square.
-        var spaceSize = boardSize / Math.Max(r, c);
+        var spaceSize = boardSize / Math.Max(rows, columns);
 
         // Vertical lines -- start on the left and move right.
-        var vLines = c - 1;
+        var vGridLines = columns - 1;
         float initialX;
-        if (vLines % 2 == 0)
+        if (vGridLines % 2 == 0)
         {
             // Even number of lines, odd number of spaces.
-            initialX = -spaceSize / 2 - ((vLines / 2 - 1) * spaceSize);
+            initialX = -spaceSize / 2 - ((vGridLines / 2 - 1) * spaceSize);
         } else {
             // Odd number of lines, even number of spaces.
             // One line is in the center.
-            initialX = -(vLines / 2 * spaceSize);
+            initialX = -(vGridLines / 2 * spaceSize);
         }
         var rot = gridLineVertPrefab.transform.rotation;
-        for (int i = 0; i < c - 1; i++) {
+        for (int i = 0; i < columns - 1; i++) {
             var pos = new Vector3((initialX + i * spaceSize), 0, 0);
-            Debug.Log("initialX = " + pos.x);
 
             var vLine = Instantiate(gridLineVertPrefab, grid.transform);
             vLine.GetComponent<RectTransform>().anchoredPosition = pos;
         }
 
         // Horizontal lines -- start at the top and move down.
-        var hLines = r - 1;
+        var hGridLines = rows - 1;
         float initialY;
-        if (vLines % 2 == 0)
+        if (hGridLines % 2 == 0)
         {
             // Even number of lines, odd number of spaces.
-            initialY = spaceSize / 2 + ((hLines / 2 - 1) * spaceSize);
+            initialY = spaceSize / 2 + ((hGridLines / 2 - 1) * spaceSize);
         }
         else
         {
             // Odd number of lines, even number of spaces.
             // One line is in the center.
-            initialY = (hLines / 2 * spaceSize);
+            initialY = (hGridLines / 2 * spaceSize);
         }
-        rot = gridLineHorizPrefab.transform.rotation; for (int i = 0; i < r - 1; i++) {
+        rot = gridLineHorizPrefab.transform.rotation; for (int i = 0; i < rows - 1; i++) {
             var pos = new Vector3(0, (initialY - i * spaceSize), 0);
-            Debug.Log("initialY = " + pos.y);
 
             var hLine = Instantiate(gridLineHorizPrefab, grid.transform);
             hLine.GetComponent<RectTransform>().anchoredPosition = pos;
         }
 
         // Instantiate the grid spaces.
-        // XXX - Fix control variable names.
         // XXX - Add buttons to buttonList array.
 
-        for (int i = 0; i < r; i++)
+        for (int r = 0; r < rows; r++)
         {
-            for (int j = 0; j < c; j++)
+            for (int c = 0; c < columns; c++)
             {
-                var xPos = (initialX - spaceSize / 2) + spaceSize * i;
-                var yPos = (initialY + spaceSize / 2) - spaceSize * j;
+                var yPos = (initialY + spaceSize / 2) - spaceSize * r;
+                var xPos = (initialX - spaceSize / 2) + spaceSize * c;
+
                 var pos = new Vector3(xPos, yPos, 0);
                 var gs = Instantiate(gridSpacePrefab, grid.transform);
                 gs.GetComponent<RectTransform>().anchoredPosition = pos;
