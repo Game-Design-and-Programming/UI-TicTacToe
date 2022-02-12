@@ -532,7 +532,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rows: 3
-  columns: 4
+  columns: 3
   k: 3
   grid: {fileID: 457092337}
 --- !u!4 &1428978840

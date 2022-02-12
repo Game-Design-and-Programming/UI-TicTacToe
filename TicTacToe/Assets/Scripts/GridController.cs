@@ -21,19 +21,21 @@ public class GridController : MonoBehaviour
     public GameObject gridLineHorizPrefab;
     public GameObject gridSpacePrefab;
 
-    // Warning! If buttonTextList is declared public, it will be set(able) in the
-    // Inspector -- that means that the length of the array will come from the Inspector,
-    // not from here. Weird, but logical...
+    // Warning! If buttonTextList is declared public, it will be set(able) in
+    // the Inspector -- that means that the length of the array will come from
+    // the Inspector, not from here. Weird, but logical...
     Text[] buttonTextList;
 
     private int rows;
     private int columns;
+    private int k; // Length of run to win.
 
     void Awake()
     {
         // XXX - should be getters.
         rows = controller.rows;
         columns = controller.columns;
+        k = controller.k;
 
         buttonTextList = new Text[controller.rows * columns];
         LayoutGrid(rows, columns);
@@ -133,8 +135,8 @@ public class GridController : MonoBehaviour
                 gs.GetComponent<RectTransform>().anchoredPosition = pos;
 
                 var buttonTextIndex = r * columns + c;
-                Debug.Log("buttonTextList.Length = " + buttonTextList.Length);
-                Debug.Log("buttonTextIndex = " + buttonTextIndex);
+                // Debug.Log("buttonTextList.Length = " + buttonTextList.Length);
+                // Debug.Log("buttonTextIndex = " + buttonTextIndex);
 
                 // Get the Text component of the Text object that is a child of the
                 // GridSpace button.
@@ -151,7 +153,7 @@ public class GridController : MonoBehaviour
         SetGameControllerReferenceOnButtons();
     }
 
-    void SetGameControllerReferenceOnButtons()
+    private void SetGameControllerReferenceOnButtons()
     {
         for (int i = 0; i < buttonTextList.Length; i++)
         {
@@ -163,49 +165,74 @@ public class GridController : MonoBehaviour
     
     public bool CheckForWin(string playerSide)
     {
-        var rv = false;
-
-        if (buttonTextList[0].text == playerSide && buttonTextList[1].text == playerSide && buttonTextList[2].text == playerSide)
+        // Check for a horizontal sequence.
+        for (int r = 0; r < rows; r++)
         {
-            rv = true;;
+            var matches = 0;
+            for (int c = 0; c < columns; c++)
+            {
+                var index = r * columns + c;
+                if (buttonTextList[index].text == playerSide)
+                {
+                    if (++matches >= k) return true;
+                } else matches = 0;
+            }
         }
 
-        if (buttonTextList[3].text == playerSide && buttonTextList[4].text == playerSide && buttonTextList[5].text == playerSide)
+        // Check for a vertical sequence.
+        for (int c = 0; c < columns; c++)
         {
-            rv = true;;
+            var matches = 0;
+            for (int r = 0; r < rows; r++)
+            {
+                var index = c * rows + r;
+                if (buttonTextList[index].text == playerSide)
+                {
+                    if (++matches >= k) return true;  
+                } else matches = 0;
+            }
         }
 
-        if (buttonTextList[6].text == playerSide && buttonTextList[7].text == playerSide && buttonTextList[8].text == playerSide)
+        // To Handle grids that are taller than k.
+        for (int i = 0; i <= (rows - k); i++)
         {
-            rv = true;;
-        }
+            var offset = i * columns;
 
-        if (buttonTextList[0].text == playerSide && buttonTextList[3].text == playerSide && buttonTextList[6].text == playerSide)
-        {
-            rv = true;;
-        }
+            // Check for a diagonal sequence -- upper left to lower right.
+            for (int c = 0; c <= (columns - k); c++)
+            {
+                var matches = 0;
+                for (int r = 0; r < rows; r++)
+                {
+                    var index = offset + c + r + r * columns;
+                    Debug.Log("index = " + index + " matches = " + matches);
+                    if (index < rows * columns &&
+                        buttonTextList[index].text == playerSide)
+                    {
+                        if (++matches >= k) return true;
+                    }
+                    else matches = 0;
+                }
+            }
 
-        if (buttonTextList[1].text == playerSide && buttonTextList[4].text == playerSide && buttonTextList[7].text == playerSide)
-        {
-            rv = true;;
+            // Check for a diagonal sequence -- upper right to lower left.
+            for (int c = columns - 1; c >= k - 1; c--)
+            {
+                var matches = 0;
+                for (int r = 0; r < rows; r++)
+                {
+                    var index = offset + c - r + r * columns;
+                    Debug.Log("index = " + index + " matches = " + matches);
+                    if (index < rows * columns &&
+                        buttonTextList[index].text == playerSide)
+                    {
+                        if (++matches >= k) return true;
+                    }
+                    else matches = 0;
+                }
+            }
         }
-
-        if (buttonTextList[2].text == playerSide && buttonTextList[5].text == playerSide && buttonTextList[8].text == playerSide)
-        {
-            rv = true;;
-        }
-
-        if (buttonTextList[0].text == playerSide && buttonTextList[4].text == playerSide && buttonTextList[8].text == playerSide)
-        {
-            rv = true;;
-        }
-
-        if (buttonTextList[2].text == playerSide && buttonTextList[4].text == playerSide && buttonTextList[6].text == playerSide)
-        {
-            rv = true;;
-        }
-
-        return rv;
+        return false;
     }
 
     public void GameOver()
